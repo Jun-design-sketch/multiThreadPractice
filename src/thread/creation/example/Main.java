@@ -1,23 +1,18 @@
 package thread.creation.example;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // Code that will run in a new thread
-                throw new RuntimeException("Intentional Exception");
-            }
-        });
-        
-        thread.setName("Misbehaving thread");
+        Thread thread = new NewThread();
 
-        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                System.out.println("A Critical error happened in thread " + t.getName()
-                + " the error is " + e.getMessage());
-            }
-        });
         thread.start();
+    }
+
+    // MEMO: Thread already implements Runnable.
+    private static class NewThread extends Thread {
+        @Override
+        public void run() {
+            //Code that executes on the new thread
+//            System.out.println("Hello from " + Thread.currentThread().getName());
+            System.out.println("Hello from " + this.getName());
+        }
     }
 }
