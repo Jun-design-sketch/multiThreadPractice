@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         List<Long> inputNumbers = Arrays.asList(0L, 3435L, 35435L, 2324L, 4656L, 23L, 2435L, 5566L);
         // We want to calculate the !0, !3435, !35435, !2324, !4656, !23, !2435, !5566
         List<FactorialThread> threads = new ArrayList<>();
@@ -17,6 +17,11 @@ public class Main {
 
         for(Thread thread : threads) {
             thread.start();
+        }
+
+        // MEMO: thread.join() : when thread complete, make return
+        for(Thread thread : threads) {
+            thread.join();
         }
 
         for(int i = 0; i < inputNumbers.size() ; i++) {
