@@ -16,12 +16,15 @@ public class Main {
         }
 
         for(Thread thread : threads) {
+            // background setting
+            thread.setDaemon(true);
             thread.start();
         }
 
         // MEMO: thread.join() : when thread complete, make return
         for(Thread thread : threads) {
-            thread.join();
+            // MEMO2 : when one of the thread takes lot of time, set a timer to return.
+            thread.join(2000);
         }
 
         for(int i = 0; i < inputNumbers.size() ; i++) {
