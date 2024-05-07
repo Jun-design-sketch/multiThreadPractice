@@ -10,6 +10,7 @@ public class main {
         thread.setDaemon(true);
         thread.start();
         thread.interrupt();
+
     }
     private static class LongComputationTask implements Runnable {
         private BigInteger base;
