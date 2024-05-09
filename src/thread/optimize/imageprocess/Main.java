@@ -14,10 +14,53 @@ public class Main {
         BufferedImage originalImage = ImageIO.read(new File(SOURCE_FILE));
         BufferedImage resultImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-        recolorSingleThreaded(originalImage, resultImage);
+        long startTime = System.currentTimeMillis();
+
+        // recolorSingleThreaded(originalImage, resultImage);
+        int numberOfThreads = 6;
+        recolorMultithreaded(originalImage, resultImage, numberOfThreads);
+
+        long endTime = System.currentTimeMillis();
+
+        long duration = endTime - startTime;
 
         File outputFile = new File(DESTINATION_FILE);
         ImageIO.write(resultImage, "jpg", outputFile);
+
+        System.out.println(String.valueOf(duration));
+    }
+
+    public static void recolorMultithreaded(BufferedImage originalImage, BufferedImage resultImage, int numberOfThreads) {
+        List<Thread> threads = new ArrayList<>();
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight() / numberOfThreads;
+
+        for(int i = 0; i < numberOfThreads; i++) {
+            final int threadMultiplier = i;
+
+            Thread thread = new Thread(() -> {
+               int xOrigin = 0;
+               int yOrigin = height * threadMultiplier;
+               recolorImage(originalImage, resultImage, xOrigin, yOrigin, width, height);
+            });
+
+            threads.add(thread);
+
+            for(Thread thread2 : threads) {
+                try {
+                    thread2.start();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+
+            for (Thread thread1 : threads) {
+                try {
+                    thread1.join();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
     }
     public static void recolorSingleThreaded(BufferedImage originalImage, BufferedImage resultImage) {
         recolorImage(originalImage, resultImage, 0, 0, originalImage.getWidth(), originalImage.getHeight());
