@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class IoBoundApplication {
-    private static final int NUMBER_OF_TASKS = 1000;
+    private static final int NUMBER_OF_TASKS = 10000;
     
 
     public static void main(String[] args) {
@@ -21,14 +21,19 @@ public class IoBoundApplication {
 
     private static void performTasks() {
         // 動的に作業に必要なスレッドを生成する
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    blockingIoOperation();
-                }
-            });
+        ExecutorService executorService = Executors.newFixedThreadPool(1000);
+        try {
+            for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+                //            executorService.submit(new Runnable() {
+                //                @Override
+                //                public void run() {
+                //                    blockingIoOperation();
+                //                }
+                //            });
+                executorService.submit(() -> blockingIoOperation());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
