@@ -1,16 +1,28 @@
 package thread.conditionalVariable.waitNotifyNotifyAll;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 public class MainApplication {
+    private static final String INPUT_FILE = "./src/thread/conditionalVariable/waitNotifyNotifyAll/output/matrices";
+    private static final String OUTPUT_FILE = "./src/thread/conditionalVariable/waitNotifyNotifyAll/output/matrices_results.txt";
     private static final int N = 10;
-    public static void main(String [] args) {
 
+    public static void main(String [] args) throws IOException {
+        ThreadSafeQueue threadSafeQueue = new ThreadSafeQueue();
+        File inputFile = new File(INPUT_FILE);
+        File outputFile = new File(OUTPUT_FILE);
+
+        MatricesReaderProducer matricesReader = new MatricesReaderProducer(
+                new FileReader(inputFile), threadSafeQueue);
+        MatricesMultiplierConsumer matricesConsumer = new MatricesMultiplierConsumer(
+                new FileWriter(outputFile), threadSafeQueue);
+
+        matricesConsumer.start();
+        matricesReader.start();
     }
 
     private static class MatricesMultiplierConsumer extends Thread {
@@ -20,6 +32,18 @@ public class MainApplication {
         public MatricesMultiplierConsumer(FileWriter fileWriter, ThreadSafeQueue queue) {
             this.fileWriter = fileWriter;
             this.queue = queue;
+        }
+
+        private static void saveMatrixToFile(FileWriter fileWriter, float [][] matrix) throws IOException {
+            for (int r = 0; r < N; r++) {
+                StringJoiner stringJoiner = new StringJoiner(", ");
+                for(int c = 0; c < N; c++) {
+                    stringJoiner.add(String.format("%.2f", matrix[r][c]));
+                }
+                fileWriter.write(stringJoiner.toString());
+                fileWriter.write('\n');
+            }
+            fileWriter.write('\n');
         }
 
         @Override
@@ -32,6 +56,11 @@ public class MainApplication {
                 }
 
                 float [][] result = multiplyMatrices(matricesPair.matrix1, matricesPair.matrix2);
+
+                try {
+                    saveMatrixToFile(fileWriter, result);
+                } catch (IOException e) {
+                }
             }
 
             try {
@@ -67,8 +96,8 @@ public class MainApplication {
         @Override
         public void run() {
             while (true) {
-                float [][] matrix1 = readMatrix();
-                float [][] matrix2 = readMatrix();
+                float[][] matrix1 = readMatrix();
+                float[][] matrix2 = readMatrix();
                 if(matrix1 == null || matrix2 == null) {
                     queue.terminate();
                     System.out.println("No more matrices to read. Producer Thread is terminating");
@@ -83,19 +112,19 @@ public class MainApplication {
             }
         }
 
-        private float [][] readMatrix() {
-            float [][] matrix = new float[N][N];
+        private float[][] readMatrix() {
+            float[][] matrix = new float[N][N];
             for(int r = 0; r < N; r++) {
                 if(!scanner.hasNext()) {
                     return null;
                 }
-                String [] line = scanner.nextLine().split(",");
+                String[] line = scanner.nextLine().split(",");
                 for(int c = 0; c < N; c++) {
                     matrix[r][c] = Float.valueOf(line[c]);
                 }
                 scanner.nextLine();
-                return matrix;
             }
+            return matrix;
         }
     }
 

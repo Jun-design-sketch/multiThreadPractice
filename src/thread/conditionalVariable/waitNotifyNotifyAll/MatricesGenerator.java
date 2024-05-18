@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.StringJoiner;
 
 public class MatricesGenerator {
-    private static final String OUTPUT_FILE = "./src/thread/conditionalVariable/waitNotifyNotifyAll/output";
+    private static final String OUTPUT_FILE = "./src/thread/conditionalVariable/waitNotifyNotifyAll/output/matrices";
     private static final int N = 10;
     private static final int NUMBER_OF_MATRIX_PAIRS = 100000;
 
